@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from .models import Post, Comment
 from django.shortcuts import render, get_object_or_404
 from .forms import  PostForm
+from django.views import generic
 
 
 def index (request):
@@ -16,6 +17,11 @@ def post_list(request):
     posts = Post.objects.all()
     context = {'posts' : posts}
     return render(request, "posts/post_list.html", context= context)
+
+class PostList(generic.ListView):
+    queryset = Post.objects.all()
+    template_name = "posts/post_list.html"
+    context_object_name = 'posts'
 
 def post_detail(request, post_id):
     # try:
