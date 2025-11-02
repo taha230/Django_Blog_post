@@ -2,6 +2,12 @@ from django.db import models
 
 # Create your models here.
 
+class PostLiveManager(models.Manager):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(is_enable = True)
+        return queryset
+
 class Post(models.Model):
     title = models.CharField(max_length=50)
     text = models.TextField(blank=True)
@@ -9,6 +15,9 @@ class Post(models.Model):
     publish_date = models.DateField(null= True ,blank=True) # blank = True makes publish date arbitrary
     created_time = models.DateTimeField(auto_now_add=True)
     uploaded_time = models.DateTimeField(auto_now=True)
+
+    objects = models.Manager()
+    live = PostLiveManager()
 
     def __str__(self):
         # return self.title

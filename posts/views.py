@@ -35,6 +35,21 @@ def post_detail(request, post_id):
     context = {'post' : post, 'comments' : comments}
     return render(request, "posts/post_detail.html", context= context)
 
+class PostDetail(generic.DetailView):
+    model = Post
+    template_name = "posts/post_detail.html"
+    # context_object_name = 'post'
+
+    # def get_queryset(self, post_id):
+    #     return get_object_or_404(Post, pk=self.request.POST['post_id'])
+
+    def get_context_data(self, **kwargs):
+        context = super(PostDetail, self).get_context_data()
+        print(kwargs) # for print the value of kwargs
+        context['comments'] = Comment.objects.filter(post = kwargs['object'].pk)
+        return context
+
+
 def post_create(request):
     if request.method == 'POST' :
         form = PostForm(request.POST)
