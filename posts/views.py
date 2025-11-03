@@ -4,11 +4,15 @@ from .models import Post, Comment
 from django.shortcuts import render, get_object_or_404
 from .forms import  PostForm
 from django.views import generic
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-
+@api_view(['GET', 'POST'])
 def index (request):
     #body
-    return HttpResponse('Welcome to Django')
+    # return HttpResponse('Welcome to Django')
+    print(request.data)
+    return Response(dict(request.data))
 
 def home (request):
     return HttpResponse('<h3>Welcome to Homepage of blog</h3>')
