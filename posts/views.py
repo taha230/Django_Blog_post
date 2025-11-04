@@ -1,3 +1,4 @@
+from django.core.serializers import serialize
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from .models import Post, Comment
@@ -6,13 +7,49 @@ from .forms import  PostForm
 from django.views import generic
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
+from .serializers import PostSerializer
+
+from rest_framework.views import APIView
+
+class PostListRestView(APIView):
+    def get(self, request):
+        posts = Post.objects.all()
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        print(request.data)
+        serializer = PostSerializer(data=request.data)
+        print(serializer)
+        if serializer.is_valid():
+            print(serializer.validated_data)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 @api_view(['GET', 'POST'])
 def index (request):
     #body
     # return HttpResponse('Welcome to Django')
-    print(request.data)
-    return Response(dict(request.data))
+    pk = request.query_params.get('pk')
+
+    print(request.query_params)
+    try:
+        p = Post.objects.get(pk=pk)
+    except Post.DoesNotExist:
+        return Response({'msg' : 'Post Does not Exists !!!' , 'status' : status.HTTP_404_NOT_FOUND})
+    serializer = PostSerializer(p)
+    print(serializer)
+    print('-' * 100)
+    # print(request.data)
+    print(serializer.data)
+
+    # return Response({'msg' :'Hello Django from REST Framework'})
+    return Response(serializer.data )
 
 def home (request):
     return HttpResponse('<h3>Welcome to Homepage of blog</h3>')
@@ -39,6 +76,17 @@ def post_detail(request, post_id):
     context = {'post' : post, 'comments' : comments}
     return render(request, "posts/post_detail.html", context= context)
 
+class PostDetailRestView(APIView):
+    def get(self, request , post_id):
+        try:
+            post = Post.objects.get(pk = post_id)
+        except Post.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+
+
 class PostDetail(generic.DetailView):
     model = Post
     template_name = "posts/post_detail.html"
@@ -52,7 +100,6 @@ class PostDetail(generic.DetailView):
         print(kwargs) # for print the value of kwargs
         context['comments'] = Comment.objects.filter(post = kwargs['object'].pk)
         return context
-
 
 def post_create(request):
     if request.method == 'POST' :
