@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from .models import Post, Comment
 from django.shortcuts import render, get_object_or_404
+from termcolor import colored
 from .forms import  PostForm
 from django.views import generic
 from rest_framework.decorators import api_view
@@ -11,6 +12,7 @@ from rest_framework import status
 from .serializers import PostSerializer
 
 from rest_framework.views import APIView
+from django.http import Http404
 
 class PostListRestView(APIView):
     def get(self, request):
@@ -77,14 +79,33 @@ def post_detail(request, post_id):
     return render(request, "posts/post_detail.html", context= context)
 
 class PostDetailRestView(APIView):
-    def get(self, request , post_id):
+    def get_object(self, pk):
         try:
-            post = Post.objects.get(pk = post_id)
+            post = Post.objects.get(pk = pk)
         except Post.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            raise Http404
+        return post
 
+    def get(self, request , pk):
+        post = self.get_object(pk)
         serializer = PostSerializer(post)
         return Response(serializer.data)
+
+    def put(self, request , pk):
+        post = self.get_object(pk)
+
+        serializer = PostSerializer(post, data= request.data)
+        if serializer.is_valid():
+            print(serializer.validated_data)
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request , pk):
+        post = self.get_object(pk)
+        post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PostDetail(generic.DetailView):

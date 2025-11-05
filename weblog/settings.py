@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--2@=b)o3g#+rvat$p=3z*l7k)2#%&7wnrf@=zz^w=us9&6u=9o'
+# Allow overriding via environment variable for containerized deployments
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure--2@=b)o3g#+rvat$p=3z*l7k)2#%&7wnrf@=zz^w=us9&6u=9o')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DJANGO_DEBUG=1 to enable debug in container/dev
+DEBUG = os.getenv('DJANGO_DEBUG', '1') in ['1', 'true', 'True', 'yes']
 
-ALLOWED_HOSTS = []
+# Comma-separated list via env, default allows all for dev containers
+_allowed_hosts = os.getenv('DJANGO_ALLOWED_HOSTS', '*')
+ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts.split(',') if h.strip()]
 
 
 # Application definition
@@ -118,6 +123,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

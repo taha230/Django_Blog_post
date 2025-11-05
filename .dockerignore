@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.git/
+.gitignore
+*.sqlite3
+db.sqlite3
+staticfiles/
+media/
+*.log
+node_modules/
+*.egg-info/
+
