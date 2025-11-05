@@ -9,6 +9,10 @@ from django.views import generic
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import generics
+from rest_framework import mixins
+from rest_framework import viewsets
+from rest_framework import permissions
 from .serializers import PostSerializer
 
 from rest_framework.views import APIView
@@ -31,7 +35,26 @@ class PostListRestView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class PostListRestViewGenericsFull( generics.ListCreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
 
+class PostListRestViewGenerics(mixins.ListModelMixin,
+                               mixins.CreateModelMixin,
+                               generics.GenericAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def get(self, request, *args, ** kwargs):
+        return self.list(request, *args, ** kwargs)
+    def post(self, request, *args, ** kwargs):
+        return self.create(request, *args, ** kwargs)
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permissions = [permissions.IsAuthenticatedOrReadOnly]
 
 @api_view(['GET', 'POST'])
 def index (request):
@@ -107,6 +130,23 @@ class PostDetailRestView(APIView):
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class PostDetailRestViewGenericsFull(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+class PostDetailRestViewGenerics(mixins.RetrieveModelMixin,
+                               mixins.UpdateModelMixin,
+                               mixins.DestroyModelMixin,
+                               generics.GenericAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def get(self, request, *args, ** kwargs):
+        return self.retrieve(request, *args, ** kwargs)
+    def put(self, request, *args, ** kwargs):
+        return self.update(request, *args, ** kwargs)
+    def delete(self, request, *args, ** kwargs):
+        return self.destroy(request, *args, ** kwargs)
 
 class PostDetail(generic.DetailView):
     model = Post
