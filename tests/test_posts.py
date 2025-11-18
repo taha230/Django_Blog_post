@@ -17,4 +17,3 @@ def test_live_manager_filters_enabled_posts():
     queryset = Post.live.all()
 
     assert list(queryset) == [live_post]
-

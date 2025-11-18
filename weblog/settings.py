@@ -22,7 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Allow overriding via environment variable for containerized deployments
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure--2@=b)o3g#+rvat$p=3z*l7k)2#%&7wnrf@=zz^w=us9&6u=9o')
+SECRET_KEY = os.getenv(
+    'DJANGO_SECRET_KEY',
+    'django-insecure--2@=b)o3g#+rvat$p=3z*l7k)2#%&7wnrf@=zz^w=us9&6u=9o',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Set DJANGO_DEBUG=1 to enable debug in container/dev
