@@ -32,6 +32,6 @@ jobs:
       - name: Run migrations
         run: python manage.py migrate --noinput
 
-      - name: Run tests
-        run: python manage.py test
+      - name: Run pytest suite
+        run: pytest
 
