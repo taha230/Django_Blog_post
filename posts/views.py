@@ -79,16 +79,20 @@ def index (request):
 def home (request):
     return HttpResponse('<h3>Welcome to Homepage of blog</h3>')
 
+
+# function-based view
 def post_list(request):
     posts = Post.objects.all()
     context = {'posts' : posts}
     return render(request, "posts/post_list.html", context= context)
 
+# class-based view
 class PostList(generic.ListView):
     queryset = Post.objects.all()
     template_name = "posts/post_list.html"
     context_object_name = 'posts'
 
+# function-based view
 def post_detail(request, post_id):
     # try:
     #     post = Post.objects.get(pk = post_id)
@@ -148,6 +152,7 @@ class PostDetailRestViewGenerics(mixins.RetrieveModelMixin,
     def delete(self, request, *args, ** kwargs):
         return self.destroy(request, *args, ** kwargs)
 
+# class-based view
 class PostDetail(generic.DetailView):
     model = Post
     template_name = "posts/post_detail.html"
@@ -162,6 +167,7 @@ class PostDetail(generic.DetailView):
         context['comments'] = Comment.objects.filter(post = kwargs['object'].pk)
         return context
 
+# with form
 def post_create(request):
     if request.method == 'POST' :
         form = PostForm(request.POST)

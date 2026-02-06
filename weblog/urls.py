@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from posts.views import index, home, post_create
+from posts.views import index, home, post_create, post_list, PostList
 
 urlpatterns = [
     path('admin/', admin.site.urls),
