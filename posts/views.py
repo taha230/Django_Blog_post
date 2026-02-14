@@ -18,6 +18,7 @@ from .serializers import PostSerializer
 from rest_framework.views import APIView
 from django.http import Http404
 
+# APIView view
 class PostListRestView(APIView):
     def get(self, request):
         posts = Post.objects.all()
@@ -51,6 +52,7 @@ class PostListRestViewGenerics(mixins.ListModelMixin,
         return self.create(request, *args, ** kwargs)
 
 
+# ViewSet view
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
